@@ -187,12 +187,17 @@ parser.add_argument('filename',
                     help='SDK library filename')
 args = parser.parse_args()
 
-print(env_filename)
+if not env_filename is None :
+    if os.name=='nt':
+        env_filename = 'C:\ASI SDK\lib\x64\ASICamera2.dll'
+    elif os.name=='posix':
+        env_filename = "/usr/lib/x86_64-linux-gnu/libASICamera2.so.1.16.3"
 # Initialize zwoasi with the name of the SDK library chez moi ici C:\ASI SDK\lib\x64\ASICamera2.dll
 try:
     asi.init(env_filename)
 except:
-    pass
+    print("""Il faut installer le SDK ou configurer la DLL avec la variable d'environnement ZWO_ASI_LIB""")
+    sys.exit()
     
 num_cameras = asi.get_num_cameras()
 if num_cameras == 0:
