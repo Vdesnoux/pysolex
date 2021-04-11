@@ -195,7 +195,7 @@ parser.add_argument('filename',
                     help='SDK library filename')
 args = parser.parse_args()
 
-if not env_filename is None :
+if env_filename is None :
     if os.name=='nt':
         env_filename = 'C:\ASI SDK\lib\x64\ASICamera2.dll'
     elif os.name=='posix':
