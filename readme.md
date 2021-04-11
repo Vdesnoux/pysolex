@@ -7,7 +7,7 @@ Preview:  shows the video from camera - to stop, click on stop button
 
 Image:    capture one Image ans save it to png - to exit press any keyboard entry, the only safe way to close the opencv window
 
-Capture:  shows the video from camera, save frame into ser file - to stop press 'q' on the keyboard
+Capture:  shows the video from camera, save frame into ser file, do not display live image building, mode may disappear in the future - to stop press 'q' on the keyboard
 
 Video:    shows the video from camera and the realtime building of the monochromatic image - to stop press 'q' on the keyboard - 
           Disk image will then be displayed in openCV window and is NOT bring to front - to exit, press any key on the keyboard
