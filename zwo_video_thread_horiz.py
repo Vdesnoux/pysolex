@@ -26,6 +26,14 @@ from astropy.io import fits
 import threading as th
 import queue
 import keyboard
+try : 
+    from serfilesreader import Serfile
+except: 
+    from serfilesreader.serfilesreader import Serfile
+#gestion de la date
+from astropy.time import Time
+from datetime import datetime
+
 
 
 __author__ = 'Valerie desnoux'
@@ -350,51 +358,39 @@ while True:
         limit_fps= 1/max_fps
         
         if event=='Capture' or event=='Video':
-          
-            #on ecrit l'entete du fichier ser
-            f=open(baseline,"wb")
-        
+            serfile_object = Serfile(baseline, NEW=True)
+            
             #camera type
-            s=cameras_found[0]
-            b=bytearray(s.encode())
-            b=np.array(b,dtype='int8')
-            f.write(b)
-        
-            #LUID, ColorID,Little_endian
-            num=np.array([0,0,0],dtype=np.uint32)
-            f.write(num)
-        
+            fileid=cameras_found[0]
+            serfile_object.setFileId(fileid)
+            
             #Largeur, hauteur, nb de bits, nb de frame
             Width=cam_MaxWidth
+            serfile_object.setImageWidth(Width)
             Height=cam_MaxHeight
-            PixelDepthPerPlane=16
-            FrameCount=1
-            num=np.array([Width,Height,PixelDepthPerPlane,FrameCount],dtype=np.uint32)
-            f.write(num)
+            serfile_object.setImageHeight(Height)
+            serfile_object.setPixelDepthPerPlane(16)
         
             #observateur, Intrument, telescope
-            s="valerie desnoux"
-            b=bytearray(s.encode())
-            for i in range(len(b),40):
-                b.append(0)
-            b=np.array(b,dtype='int8')
-            f.write(b)
-            s='Exp :'+str(Exp/1000)+' Gain : '+str(Gain)
-            b=bytearray(s.encode())
-            for i in range(len(b),40):
-                b.append(0)
-            b=np.array(b,dtype='int8')
-            f.write(b)
-            s="pySolexZwo"
-            b=bytearray(s.encode())
-            for i in range(len(b),40):
-                b.append(0)
-            b=np.array(b,dtype='int8')
-            f.write(b)
+            s="valerie desnoux" #TODO a mettre dans la GUI
+            serfile_object.setObserver(s)
+            
+            
+            s='Exp :'+str(Exp/1000)+' Gain : '+str(Gain) 
+            serfile_object.setInstrument(s)
+            
+            s="pySolexZwo" #TODO add optical information
+            serfile_object.setTelescope(s)
         
-            # date et date UTC ici a zero
-            num=np.array([0,0],dtype=np.uint64)
-            f.write(num)
+            # date et date UTC
+            date = Time.now().jd
+            serfile_object.setDateTimeUTC(date)
+            
+            # date
+            dateUTC = Time(datetime.utcnow(), scale='utc').jd
+            serfile_object.setDateTimeUTC(dateUTC)
+            
+            
 
         
         """
@@ -460,7 +456,7 @@ while True:
             # modes capture et video ecrivent le fichier ser
             if event=='Capture' or event=='Video': 
                 mydata=np.add(frame,mydata)
-                f.write(frame)
+                serfile_object.addFrame(mydata)
                 
                 # test si la touche 'q' a été appuyée pour arreter
                 if keyboard.is_pressed('q') or keyboard.is_pressed(' '):
@@ -517,10 +513,9 @@ while True:
         
         if event=='Capture' or event=='Video':
             #on met a jour le FrameCount  et on ferme le fichier ser
-            f.seek (38)
+
             FrameNb=np.array([FrameCount], dtype='uint32')
-            f.write(FrameNb)
-            f.close()
+            serfile_object.addFrame(FrameNb,dtype='uint16' )
         
             # Calcul de l'image moyenne
             myimg=mydata/(FrameCount-1)             # Moyenne
