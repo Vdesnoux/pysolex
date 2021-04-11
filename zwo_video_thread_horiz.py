@@ -233,10 +233,10 @@ cam_MaxHeight=info_size[3]
 on lance la fenetre pour recuperer les parametres d'acquisition et declencher actions
 --------------------------------------------------------------------------------------
 """
-#ROI_full_init='0,0,'+str(camera_info ['MaxWidth'])+','+str(camera_info ['MaxHeight'])
+ROI_full_init='0,0,'+str(camera_info ['MaxWidth'])+','+str(camera_info ['MaxHeight'])
 
-# Aie ! oui ici je declare en dur - TODO: fichier de config ini
-ROI_full_init='500,328,1000,88' 
+# Aie ! oui ici je peux declarer en dur - TODO: fichier de config ini
+#ROI_full_init='500,328,1000,88' 
 
 sg.theme('Dark2')
 sg.theme_button_color(('white', '#500000'))            
