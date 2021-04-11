@@ -201,6 +201,7 @@ if not env_filename is None :
     elif os.name=='posix':
         env_filename = "/usr/lib/x86_64-linux-gnu/libASICamera2.so.1.16.3"
 # Initialize zwoasi with the name of the SDK library chez moi ici C:\ASI SDK\lib\x64\ASICamera2.dll
+print(env_filename)
 try:
     asi.init(env_filename)
 except:
@@ -514,7 +515,7 @@ while True:
         if event=='Capture' or event=='Video':
             #on met a jour le FrameCount  et on ferme le fichier ser
 
-            FrameNb=np.array([FrameCount], dtype='uint32')
+            FrameNb=np.array([FrameCount], dtype='uint32')  #TODO pouquoi 32 bits ?
             serfile_object.addFrame(FrameNb,dtype='uint16' )
         
             # Calcul de l'image moyenne
