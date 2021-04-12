@@ -363,7 +363,7 @@ while True:
             
             #camera type
             fileid=cameras_found[0]
-            serfile_object.setFileId(fileid)
+            serfile_object.setFileID(fileid)
             
             #Largeur, hauteur, nb de bits, nb de frame
             Width=cam_MaxWidth
@@ -515,7 +515,7 @@ while True:
         if event=='Capture' or event=='Video':
             #on met a jour le FrameCount  et on ferme le fichier ser
 
-            FrameNb=np.array([FrameCount], dtype='uint32')  #TODO pouquoi 32 bits ?
+            FrameNb=np.array([FrameCount], dtype='uint32')  #TODO pouquoi 32 bits ? je ne comprends pas ces deux lignes.
             serfile_object.addFrame(FrameNb,dtype='uint16' )
         
             # Calcul de l'image moyenne
