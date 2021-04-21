@@ -9,6 +9,8 @@ Travaille sur des images spectrales horizontales
 Affiche en temps réel avec open CV et Thread pour affichage
 Nom du fichier ser construit au format heure_min_sec pris au debut de l'acquisition
 
+version 0.0.2 avec modif JB Butet serfilesreader module
+
 """
 import argparse
 import os
@@ -37,7 +39,7 @@ from datetime import datetime
 
 
 __author__ = 'Valerie desnoux'
-__version__ = '0.0.0'
+__version__ = '0.0.2'
 
 
 # subroutine pour eventuellement sauvegarder les valeurs de controles de la camera
@@ -515,8 +517,10 @@ while True:
         if event=='Capture' or event=='Video':
             #on met a jour le FrameCount  et on ferme le fichier ser
 
-            FrameNb=np.array([FrameCount], dtype='uint32')  #TODO pouquoi 32 bits ? je ne comprends pas ces deux lignes.
-            serfile_object.addFrame(FrameNb,dtype='uint16' )
+            #FrameNb=np.array([FrameCount], dtype='uint32')  #TODO pouquoi 32 bits ? je ne comprends pas ces deux lignes.
+            #serfile_object.addFrame(FrameNb,dtype='uint32' )
+            
+
         
             # Calcul de l'image moyenne
             myimg=mydata/(FrameCount-1)             # Moyenne
