@@ -223,11 +223,16 @@ if env_filename is None :
         env_filename = "/usr/lib/x86_64-linux-gnu/libASICamera2.so.1.16.3"
 # Initialize zwoasi with the name of the SDK library chez moi ici C:\ASI SDK\lib\x64\ASICamera2.dll
 print(env_filename)
-try:
+
+try : 
     asi.init(env_filename)
-except:
-    print("""Il faut installer le SDK ou configurer la DLL avec la variable d'environnement ZWO_ASI_LIB""")
-    sys.exit()
+except  :
+    e = str(sys.exc_info()[1])
+    if 'initialized' in e : #for a weird reason, sometimes librairy is not closed...
+        pass
+    else : 
+         print("""Il faut installer le SDK ou configurer la DLL avec la variable d'environnement ZWO_ASI_LIB""")
+         sys.exit()
     
 num_cameras = asi.get_num_cameras()
 if num_cameras == 0:
