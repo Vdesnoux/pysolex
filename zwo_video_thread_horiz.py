@@ -27,7 +27,7 @@ import datetime as dt
 from astropy.io import fits
 import threading as th
 import queue
-import keyboard
+from pynput import keyboard
 try : 
     from serfilesreader import Serfile
 except: 
@@ -40,6 +40,25 @@ from datetime import datetime
 
 __author__ = 'Valerie desnoux'
 __version__ = '0.0.2'
+
+
+"""
+-------------------------------------------------------------------------------------
+"""
+def on_press(key):
+    global q_pressed
+    try:
+        #print('alphanumeric key{0}pressed'.format(key.char))
+        pass
+    except AttributeError:
+        #print('special key{0}pressed'.format(key))
+        pass
+
+def on_release(key):
+    global q_pressed
+    if str(key).strip("'") == 'q':# Stop listener
+        q_pressed=True
+        print('q pressed')
 
 
 # subroutine pour eventuellement sauvegarder les valeurs de controles de la camera
@@ -204,11 +223,16 @@ if env_filename is None :
         env_filename = "/usr/lib/x86_64-linux-gnu/libASICamera2.so.1.16.3"
 # Initialize zwoasi with the name of the SDK library chez moi ici C:\ASI SDK\lib\x64\ASICamera2.dll
 print(env_filename)
-try:
+
+try : 
     asi.init(env_filename)
-except:
-    print("""Il faut installer le SDK ou configurer la DLL avec la variable d'environnement ZWO_ASI_LIB""")
-    sys.exit()
+except  :
+    e = str(sys.exc_info()[1])
+    if 'initialized' in e : #for a weird reason, sometimes librairy is not closed...
+        pass
+    else : 
+         print("""Il faut installer le SDK ou configurer la DLL avec la variable d'environnement ZWO_ASI_LIB""")
+         sys.exit()
     
 num_cameras = asi.get_num_cameras()
 if num_cameras == 0:
@@ -250,6 +274,18 @@ on lance la fenetre pour recuperer les parametres d'acquisition et declencher ac
 --------------------------------------------------------------------------------------
 """
 ROI_full_init='0,0,'+str(camera_info ['MaxWidth'])+','+str(camera_info ['MaxHeight'])
+
+
+
+"""
+--------------------------------------------------------------------------------------
+Gestion du clavier multiplateforme
+--------------------------------------------------------------------------------------
+"""
+listener = keyboard.Listener(on_press=on_press,on_release=on_release)
+listener.start()
+q_pressed = False
+
 
 # Aie ! oui ici je peux declarer en dur - TODO: fichier de config ini
 #ROI_full_init='500,328,1000,88' 
@@ -462,10 +498,12 @@ while True:
                 serfile_object.addFrame(mydata)
                 
                 # test si la touche 'q' a été appuyée pour arreter
-                if keyboard.is_pressed('q') or keyboard.is_pressed(' '):
+                #if keyboard.is_pressed('q') or keyboard.is_pressed(' '):
+                if q_pressed :
                     print('\a')       # beep !!             
                     ok_flag=False
                     q.put(None)
+                    q_pressed=False
             
             FrameCount=FrameCount+1
             
@@ -515,13 +553,6 @@ while True:
 
         
         if event=='Capture' or event=='Video':
-            #on met a jour le FrameCount  et on ferme le fichier ser
-
-            #FrameNb=np.array([FrameCount], dtype='uint32')  #TODO pouquoi 32 bits ? je ne comprends pas ces deux lignes.
-            #serfile_object.addFrame(FrameNb,dtype='uint32' )
-            
-
-        
             # Calcul de l'image moyenne
             myimg=mydata/(FrameCount-1)             # Moyenne
             myimg=np.array(myimg, dtype='uint16')   # Passe en entier 16 bits
